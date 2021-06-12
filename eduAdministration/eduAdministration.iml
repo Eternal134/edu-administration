@@ -14,10 +14,7 @@
       <configuration>
         <setting name="validation-enabled" value="true" />
         <setting name="provider-name" value="Hibernate" />
-        <datasource-mapping>
-          <factory-entry name="eduAdministration" />
-          <factory-entry name="entityManagerFactory" value="47ad8cb5-1f1a-4681-bb99-4ca74f31e031" />
-        </datasource-mapping>
+        <datasource-mapping />
         <naming-strategy-map />
       </configuration>
     </facet>

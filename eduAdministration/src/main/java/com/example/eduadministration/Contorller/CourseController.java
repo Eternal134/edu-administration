@@ -1,8 +1,9 @@
 package com.example.eduadministration.Contorller;
 
-import com.example.eduadministration.Model.Course;
+import com.example.eduadministration.Mapper.Course;
 import com.example.eduadministration.Service.BaseSqlService;
-import com.example.eduadministration.Service.CourseBaseSqlServiceImpl;
+import com.example.eduadministration.Service.CourseSqlServiceImpl;
+import com.example.eduadministration.response.BaseResponse;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,13 +20,14 @@ public class CourseController {
 
     private final BaseSqlService service;
 
-    public CourseController(CourseBaseSqlServiceImpl service) {
+    public CourseController(CourseSqlServiceImpl service) {
         this.service = service;
     }
 
     @PostMapping("/add")
-    void addCourse(@RequestBody Course course) {
-        service.addRecord(course);
-    }
+    BaseResponse addCourse(@RequestBody Course course) {
 
+        service.addRecord(course);
+        return new BaseResponse("0", "");
+    }
 }

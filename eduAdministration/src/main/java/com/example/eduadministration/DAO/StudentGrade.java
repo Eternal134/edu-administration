@@ -1,6 +1,8 @@
 package com.example.eduadministration.DAO;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author 秋猫
@@ -8,6 +10,7 @@ import lombok.Data;
  * @description 表示学生成绩的模型
  */
 @Data
+@AllArgsConstructor
 public class StudentGrade {
 
     /**
@@ -28,7 +31,7 @@ public class StudentGrade {
     /**
      * 课程成绩
      */
-    private double grade;
+    private double score;
 
     /**
      * 学年
@@ -39,4 +42,7 @@ public class StudentGrade {
      * 学期
      */
     private String schoolTerm;
+
+    /** 学分*/
+    private int credit;
 }

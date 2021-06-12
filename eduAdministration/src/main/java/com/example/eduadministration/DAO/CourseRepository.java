@@ -1,6 +1,6 @@
 package com.example.eduadministration.DAO;
 
-import com.example.eduadministration.Model.Course;
+import com.example.eduadministration.Mapper.Course;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 

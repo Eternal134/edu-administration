@@ -1,37 +1,42 @@
 package com.example.eduadministration.Contorller;
 
-import com.example.eduadministration.Model.StudentUser;
-import com.example.eduadministration.Model.User;
-import com.example.eduadministration.DAO.StudentUserRepository;
-import com.example.eduadministration.Service.StudentUserServiceImpl;
+import com.example.eduadministration.Mapper.Security;
+import com.example.eduadministration.Service.UserServiceImpl;
+import com.example.eduadministration.response.BaseResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Iterator;
-import java.util.List;
-
-/**
- * @author 秋猫
- * @version 2021-05-11 20:19
- * @description 描述
- */
 @RestController
-@RequestMapping("/user")
 public class UserController {
 
-    private final StudentUserServiceImpl userService;
+    private final UserServiceImpl userService;
 
-    /**
-     * 构造器依赖注入
-     */
     @Autowired
-    public UserController(StudentUserServiceImpl userService) {
+    public UserController(UserServiceImpl userService) {
         this.userService = userService;
     }
 
-    @GetMapping("/student/all")
-    public Iterable<?> getAllStudentUser() {
-        return userService.allUser();
+    @PostMapping("/login")
+    BaseResponse login(@RequestBody Security user) {
+
+        try {
+            return userService.verifyUser(user);
+        } catch (Exception e) {
+            return new BaseResponse("1", e.getMessage());
+        }
+    }
+
+    @PostMapping("/user/add")
+    BaseResponse addUser(@RequestBody Security user) {
+
+        try {
+            userService.addRecord(user);
+        } catch (Exception e) {
+            return new BaseResponse("1", e.getMessage());
+        }
+
+        return new BaseResponse("0", "");
     }
 }
