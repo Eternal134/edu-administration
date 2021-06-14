@@ -1,13 +1,10 @@
 package com.example.eduadministration.Contorller;
 
 import com.example.eduadministration.Mapper.Course;
-import com.example.eduadministration.Service.BaseSqlService;
-import com.example.eduadministration.Service.CourseSqlServiceImpl;
+import com.example.eduadministration.Service.BaseService;
+import com.example.eduadministration.Service.CourseServiceImpl;
 import com.example.eduadministration.response.BaseResponse;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * @author 秋猫
@@ -18,16 +15,40 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/course")
 public class CourseController {
 
-    private final BaseSqlService service;
+    private final CourseServiceImpl service;
 
-    public CourseController(CourseSqlServiceImpl service) {
+    public CourseController(CourseServiceImpl service) {
         this.service = service;
     }
 
     @PostMapping("/add")
-    BaseResponse addCourse(@RequestBody Course course) {
+    BaseResponse<?> addCourse(@RequestBody Course course) {
 
-        service.addRecord(course);
-        return new BaseResponse("0", "");
+        try {
+            service.addRecord(course);
+            return BaseResponse.builder()
+                    .code("0")
+                    .build();
+        } catch (Exception e) {
+            return BaseResponse.builder()
+                    .code("1")
+                    .errorMessage(e.getMessage())
+                    .build();
+        }
+    }
+
+    @GetMapping("/all")
+    BaseResponse<?> findAllCourse() {
+        try {
+            return BaseResponse.<Course>builder()
+                    .code("0")
+                    .data(service.findAllRecord())
+                    .build();
+        } catch (Exception e) {
+            return BaseResponse.builder()
+                    .code("1")
+                    .errorMessage(e.getMessage())
+                    .build();
+        }
     }
 }

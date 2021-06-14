@@ -1,9 +1,11 @@
 package com.example.eduadministration.Contorller;
 
+import com.example.eduadministration.Exception.LoginException;
 import com.example.eduadministration.Mapper.Security;
 import com.example.eduadministration.Service.UserServiceImpl;
 import com.example.eduadministration.response.BaseResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -19,24 +21,50 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    BaseResponse login(@RequestBody Security user) {
+    BaseResponse<?> login(@RequestBody Security user) {
 
         try {
-            return userService.verifyUser(user);
-        } catch (Exception e) {
-            return new BaseResponse("1", e.getMessage());
+            userService.verifyUser(user);
+            return BaseResponse.builder()
+                    .code("0")
+                    .build();
+        } catch (Exception loginException) {
+            return BaseResponse.builder()
+                    .code("1")
+                    .errorMessage(loginException.getMessage())
+                    .build();
         }
     }
 
     @PostMapping("/user/add")
-    BaseResponse addUser(@RequestBody Security user) {
+    BaseResponse<?> addUser(@RequestBody Security user) {
 
         try {
             userService.addRecord(user);
+            return BaseResponse.builder()
+                    .code("0")
+                    .build();
         } catch (Exception e) {
-            return new BaseResponse("1", e.getMessage());
+            return BaseResponse.builder()
+                    .code("1")
+                    .errorMessage(e.getMessage())
+                    .build();
         }
 
-        return new BaseResponse("0", "");
+    }
+
+    @GetMapping("/user/all")
+    BaseResponse<?> findAllUser() {
+        try {
+            return BaseResponse.<Security>builder()
+                    .code("0")
+                    .data(userService.findAllUser())
+                    .build();
+        } catch (Exception e) {
+            return BaseResponse.builder()
+                    .code("1")
+                    .errorMessage(e.getMessage())
+                    .build();
+        }
     }
 }

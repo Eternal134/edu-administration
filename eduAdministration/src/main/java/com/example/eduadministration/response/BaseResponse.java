@@ -11,20 +11,14 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @NoArgsConstructor
-public class BaseResponse {
+public class BaseResponse<T> {
 
     private String code;
 
     private String errorMessage;
 
-    private List<?> data;
-
-    public BaseResponse(String code) {
-        this.code = code;
-    }
-
-    public BaseResponse(String code, String errorMessage) {
-        this.code = code;
-        this.errorMessage = errorMessage;
-    }
+    /**
+     * 保存列表类型结果
+     */
+    private List<T> data;
 }

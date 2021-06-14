@@ -16,4 +16,12 @@ public class StudentResponse {
     private String mail;
 
     private double score;
+
+    public StudentResponse(String studentId, String name, String sex, String mail) {
+        this.studentId = studentId;
+        this.name = name;
+        this.sex = sex;
+        this.mail = mail;
+        this.score = -1;
+    }
 }

@@ -1,11 +1,14 @@
 package com.example.eduadministration.Service;
 
 import com.example.eduadministration.DAO.CourseStudentRepository;
-import com.example.eduadministration.DAO.StudentGrade;
+import com.example.eduadministration.DAO.StudentRepository;
+import com.example.eduadministration.response.StudentGrade;
 import com.example.eduadministration.Mapper.CourseStudent;
 import com.example.eduadministration.request.OriginGrade;
 import com.example.eduadministration.request.QueryGradeRequest;
 import com.example.eduadministration.response.GradeAnalyse;
+import com.example.eduadministration.response.GradeStatistics;
+import com.example.eduadministration.response.StudentResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,22 +18,29 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class GradeSqlServiceImpl implements BaseSqlService{
+public class GradeServiceImpl implements BaseService {
 
-    private final CourseStudentRepository repository;
+    private final CourseStudentRepository courseStudentRepository;
+
+    private final StudentRepository studentRepository;
 
     @Autowired
-    public GradeSqlServiceImpl(CourseStudentRepository repository) {
+    public GradeServiceImpl(CourseStudentRepository repository, StudentRepository studentRepository) {
 
-        this.repository = repository;
+        this.courseStudentRepository = repository;
+        this.studentRepository = studentRepository;
     }
 
     @Override
     public void addRecord(Object object) {
 
-        repository.save(calculateFinalGrade((OriginGrade) object));
+        courseStudentRepository.save(calculateFinalGrade((OriginGrade) object));
     }
 
+    /**
+     * @param originGrade 平时分、卷面分和占比
+     * @return 最终成绩
+     */
     CourseStudent calculateFinalGrade(OriginGrade originGrade) {
 
         CourseStudent grade = new CourseStudent();
@@ -43,12 +53,15 @@ public class GradeSqlServiceImpl implements BaseSqlService{
         return grade;
     }
 
+    /**
+     * 查成绩单
+     */
     public List<StudentGrade> queryGrade(QueryGradeRequest request) {
 
         String studentId = request.getStudentId();
         String schoolYear = request.getSchoolYear();
         String schoolTerm = request.getSchoolTerm();
-        List<StudentGrade> gradeList = repository.fetchAllCourseByStudentId(studentId);
+        List<StudentGrade> gradeList = courseStudentRepository.fetchAllCourseByStudentId(studentId);
         List<StudentGrade> response = new ArrayList<>();
         if ("".equals(schoolYear)) {
             response = gradeList;
@@ -68,9 +81,13 @@ public class GradeSqlServiceImpl implements BaseSqlService{
         return response;
     }
 
+    /**
+     * @param studentId 学号
+     * @return 成绩分析
+     */
     public GradeAnalyse analyzeGrade(String studentId) {
 
-        List<StudentGrade> gradeList = repository.fetchAllCourseByStudentId(studentId);
+        List<StudentGrade> gradeList = courseStudentRepository.fetchAllCourseByStudentId(studentId);
         int totalCredits = 0, lostCredits = 0;
         double gradePoint = 0, gradePointAverage = 0;
         for (StudentGrade grade: gradeList) {
@@ -88,5 +105,35 @@ public class GradeSqlServiceImpl implements BaseSqlService{
             gradePointAverage = gradePoint / totalCredits;
         }
         return new GradeAnalyse(totalCredits, gradePoint, gradePointAverage, lostCredits);
+    }
+
+    /**
+     * @param courseId 课程号
+     * @return 这门课学生的全班成绩统计数据
+     */
+    public GradeStatistics countGrade(int courseId) {
+        List<StudentResponse> studentResponseList = studentRepository.fetchAllStudentGradeByCourseId(courseId);
+
+        int totalStudent = studentResponseList.size();
+        if (totalStudent == 0) {
+            // 如果总人数为0
+            return GradeStatistics.builder().build();
+        }
+        int passedStudent = 0, excellentStudent = 0;
+        double sumScore = 0, highestScore = -1;
+        for(StudentResponse student: studentResponseList) {
+            double score = student.getScore();
+            sumScore += score;
+            passedStudent += score >= 60 ? 1 : 0;
+            excellentStudent += score >= 80 ? 1 : 0;
+            highestScore = Math.max(score, highestScore);
+        }
+        return GradeStatistics.builder()
+                .studentNum(totalStudent)
+                .averageScore(sumScore / totalStudent)
+                .passedRate((double) passedStudent / totalStudent)
+                .highestScore(highestScore)
+                .excellentRate((double) excellentStudent / totalStudent)
+                .build();
     }
 }

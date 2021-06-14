@@ -1,7 +1,7 @@
 package com.example.eduadministration.DAO;
 
 import com.example.eduadministration.Mapper.CourseStudent;
-import com.example.eduadministration.DAO.StudentGrade;
+import com.example.eduadministration.response.StudentGrade;
 import org.hibernate.mapping.PrimaryKey;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -19,9 +19,9 @@ public interface CourseStudentRepository extends CrudRepository<CourseStudent, P
      * @param studentId 学号
      * @return 所有已修课程成绩
      */
-    @Query("SELECT new com.example.eduadministration.DAO.StudentGrade(a.studentId, b.courseId, c.name, b.score, " +
+    @Query("SELECT new com.example.eduadministration.response.StudentGrade(a.studentId, b.courseId, c.name, b.score, " +
             "c.schoolYear, c.schoolTerm, c.credit) " +
             "FROM Student AS a, CourseStudent AS b, Course AS c " +
-            "WHERE a.studentId = :studentId AND b.studentId = a.studentId AND c.courseId = b.courseId")
+            "WHERE a.studentId = :studentId AND b.studentId = a.studentId AND c.courseId = b.courseId AND b.score IS NOT NULL")
     List<StudentGrade> fetchAllCourseByStudentId(@Param("studentId") String studentId);
 }

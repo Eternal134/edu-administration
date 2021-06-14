@@ -15,7 +15,7 @@ import java.util.List;
  * @version $Id: UserRepository.java, v 0.1 2021-05-11 8:08 下午 eleme Exp $$
  */
 @Repository
-public interface StudentUserRepository extends CrudRepository<Student, Long> {
+public interface StudentRepository extends CrudRepository<Student, Long> {
 
     /**
      * 根据用户的工号查询用户，只能查到一个
@@ -32,11 +32,20 @@ public interface StudentUserRepository extends CrudRepository<Student, Long> {
     List<Student> findByName(String name);
 
     /**
-     * 根据课程id查询所有选修了这门课的学生
+     * 根据课程id查询所有选修了这门课的已有成绩的学生
      * @param courseId 课程号
      */
     @Query("SELECT new com.example.eduadministration.response.StudentResponse (a.studentId, a.name, a.sex, a.mail, " +
             "b.score) FROM Student as a, CourseStudent as b " +
-            "WHERE a.studentId = b.studentId AND b.courseId = :course_id ")
-    List<StudentResponse> fetchAllStudentByCourseId(@Param("course_id") int courseId);
+            "WHERE a.studentId = b.studentId AND b.courseId = :course_id AND b.score IS NOT NULL")
+    List<StudentResponse> fetchAllStudentGradeByCourseId(@Param("course_id") int courseId);
+
+    /**
+     * @param courseId 课程号
+     * @return 选择了这门课但是还没有成绩的学生
+     */
+    @Query("SELECT new com.example.eduadministration.response.StudentResponse (a.studentId, a.name, a.sex, a.mail)" +
+            " FROM Student as a, CourseStudent as b " +
+            "WHERE a.studentId = b.studentId AND b.courseId = :course_id AND b.score IS NULL")
+    List<StudentResponse> fetchAllStudentNonGradeByCourseId(@Param("course_id") int courseId);
 }

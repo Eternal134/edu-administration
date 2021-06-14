@@ -1,4 +1,4 @@
-package com.example.eduadministration.DAO;
+package com.example.eduadministration.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
