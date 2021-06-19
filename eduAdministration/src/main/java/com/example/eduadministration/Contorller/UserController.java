@@ -10,6 +10,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+
 @RestController
 public class UserController {
 
@@ -25,8 +29,10 @@ public class UserController {
 
         try {
             userService.verifyUser(user);
-            return BaseResponse.builder()
+            String userType = user.getUserId().contains("E") ? "student" : "teacher";
+            return BaseResponse.<String>builder()
                     .code("0")
+                    .data(Collections.singletonList(userType))
                     .build();
         } catch (Exception loginException) {
             return BaseResponse.builder()
